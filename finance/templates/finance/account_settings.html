@@ -2,21 +2,6 @@
 {% block title %}Account Settings{% endblock %}
 
 {% block content %}
-{% if messages %}
-    {% for message in messages %}
-        <div class="mb-4 p-3 rounded-lg 
-            {% if message.tags == 'success' %}
-                bg-green-100 text-green-700
-            {% elif message.tags == 'error' %}
-                bg-red-100 text-red-700
-            {% else %}
-                bg-gray-100 text-gray-700
-            {% endif %}
-        ">
-            {{ message }}
-        </div>
-    {% endfor %}
-{% endif %}
 <div class="max-w-4xl mx-auto mt-12 bg-white p-10 rounded-2xl shadow-xl">
 
     <h1 class="text-3xl font-bold text-indigo-600 mb-10 text-center">
@@ -35,30 +20,47 @@
         {% csrf_token %}
 
         <!-- ================= PROFILE SECTION ================= -->
-        
+        <div>
             <h2 class="text-xl font-semibold mb-6 text-gray-700">Profile</h2>
 
             <div class="flex flex-col md:flex-row items-center gap-8">
-
                 <!-- Avatar -->
                 <div class="relative group w-32 h-32">
-
+                    <!-- Avatar Image -->
                     <img 
                         id="avatarPreview"
                         src="{% if user.profile.avatar %}{{ user.profile.avatar.url }}{% else %}/static/images/default_avatar.png{% endif %}" 
+                        alt="Profile Avatar"
                         class="w-32 h-32 rounded-full object-cover border-4 border-indigo-500 shadow-md"
                     >
 
-                    <div class="absolute inset-0 rounded-full bg-black bg-opacity-50 
-                                flex items-center justify-center 
-                                opacity-0 group-hover:opacity-100 
-                                transition duration-300 cursor-pointer">
+                    <!-- Clickable Overlay - Fixed Version -->
+                    <div 
+                        onclick="document.getElementById('id_avatar').click();"
+                        class="absolute inset-0 rounded-full bg-black bg-opacity-50 
+                               flex items-center justify-center 
+                               opacity-0 group-hover:opacity-100 
+                               transition duration-300 cursor-pointer"
+                        role="button"
+                        tabindex="0"
+                        onkeydown="if(event.key==='Enter'||event.key===' ') document.getElementById('id_avatar').click();"
+                    >
                         <span class="text-white text-sm font-semibold">
                             Edit Avatar
                         </span>
                     </div>
 
-                    {{ profile_form.avatar }}
+                    <!-- Hidden File Input -->
+                    <input type="file" 
+                           name="{{ profile_form.avatar.name }}" 
+                           id="id_avatar" 
+                           accept="image/*"
+                           class="hidden">
+                    {% if profile_form.avatar.errors %}
+                        <p class="text-red-500 text-sm mt-1">
+                            {{ profile_form.avatar.errors.0 }}
+                        </p>
+                    {% endif %}
                 </div>
 
                 <!-- Bio -->
@@ -71,11 +73,11 @@
                         </p>
                     {% endif %}
                 </div>
-
             </div>
-        
+        </div>
 
         <!-- ================= ACCOUNT INFO ================= -->
+        <div>
             <h2 class="text-xl font-semibold mb-6 text-gray-700">Account Info</h2>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -94,11 +96,12 @@
                     {{ user_form.email }}
                     {% if user_form.email.errors %}
                         <p class="text-red-500 text-sm mt-1">
-                            {{ user_form.username.errors.0 }}
+                            {{ user_form.email.errors.0 }}
                         </p>
                     {% endif %}
                 </div>
             </div>
+        </div>
 
         <!-- ================= FINANCE SETTINGS ================= -->
         <div>
@@ -119,7 +122,6 @@
 
         <!-- ================= ACTION BUTTONS ================= -->
         <div class="pt-10 border-t flex flex-col md:flex-row gap-4">
-
             <button type="submit" 
                 class="flex-1 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold transition">
                 Save Changes
@@ -129,7 +131,6 @@
                class="flex-1 text-center px-6 py-3 bg-gray-200 hover:bg-gray-300 rounded-xl font-semibold transition">
                 Change Password
             </a>
-
         </div>
 
         <div class="text-center mt-6">
@@ -142,20 +143,57 @@
     </form>
 </div>
 
+<!-- JavaScript for Image Preview -->
 <script>
-    const avatarInput = document.getElementById("id_avatar");
-    const avatarPreview = document.getElementById("avatarPreview");
+document.addEventListener('DOMContentLoaded', function() {
+    const avatarInput = document.getElementById('id_avatar');
+    const avatarPreview = document.getElementById('avatarPreview');
 
     if (avatarInput) {
-        avatarInput.classList.add("absolute", "inset-0", "opacity-0", "cursor-pointer");
+        console.log('Avatar input found'); // Debugging
 
-        avatarInput.addEventListener("change", function() {
-            const file = this.files[0];
+        avatarInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
             if (file) {
-                avatarPreview.src = URL.createObjectURL(file);
+                console.log('File selected:', file.name); // Debugging
+                
+                // Validate file type
+                if (!file.type.startsWith('image/')) {
+                    alert('Please select an image file');
+                    return;
+                }
+                
+                // Validate file size (max 5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('File size should be less than 5MB');
+                    return;
+                }
+
+                // Preview image
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    avatarPreview.src = e.target.result;
+                }
+                reader.readAsDataURL(file);
             }
         });
+
+        // Test if file input is accessible
+        avatarInput.addEventListener('click', function() {
+            console.log('File input clicked');
+        });
+    } else {
+        console.error('Avatar input not found!');
     }
+
+    // Debug: Check if overlay is clickable
+    const overlay = document.querySelector('[onclick*="id_avatar"]');
+    if (overlay) {
+        console.log('Overlay found, click handler attached');
+    } else {
+        console.error('Overlay not found!');
+    }
+});
 </script>
 
 {% endblock %}

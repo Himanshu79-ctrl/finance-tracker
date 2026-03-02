@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -32,7 +33,7 @@
                 <div x-data="{ open: false }" class="relative">
                     <button @click="open = !open" class="focus:outline-none">
                         <img 
-                            src="{% if user.profile.avatar %}{{ user.profile.avatar.url }}{% else %}/static/avatars/default_avatar.png{% endif %}" 
+                            src="{% if user.profile.avatar %}{{ user.profile.avatar.url }}{% else %}/static/images/default_avatar.png{% endif %}" 
                             alt="Avatar" 
                             class="w-10 h-10 rounded-full object-cover border-2 border-white hover:ring-2 hover:ring-white transition"
                         >
