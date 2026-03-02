@@ -1,0 +1,62 @@
+{% extends 'finance/base.html' %}
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto mt-10 bg-white p-8 rounded-xl shadow-lg">
+
+    <div class="flex flex-col items-center">
+
+        <!-- Avatar -->
+        <img 
+            src="{% if user.profile.avatar %}{{ user.profile.avatar.url }}{% else %}/static/images/default_avatar.png{% endif %}" 
+            class="w-28 h-28 rounded-full object-cover border-4 border-indigo-500 shadow mb-4"
+        >
+
+        <h2 class="text-2xl font-bold text-gray-800">
+            {{ user.username|capfirst }}
+        </h2>
+
+        <p class="text-gray-500">
+            {{ user.email }}
+        </p>
+
+    </div>
+
+    <!-- Bio -->
+    {% if user.profile.bio %}
+    <div class="mt-6 text-center">
+        <p class="text-gray-700 italic">
+            "{{ user.profile.bio }}"
+        </p>
+    </div>
+    {% endif %}
+
+    <!-- Finance Info -->
+    <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6 text-center">
+
+        <div class="p-4 bg-indigo-50 rounded-lg">
+            <h3 class="text-sm text-gray-500">Monthly Budget</h3>
+            <p class="text-xl font-semibold text-indigo-600">
+                {{ user.profile.currency }} {{ user.profile.monthly_budget }}
+            </p>
+        </div>
+
+        <div class="p-4 bg-green-50 rounded-lg">
+            <h3 class="text-sm text-gray-500">Member Since</h3>
+            <p class="text-xl font-semibold text-green-600">
+                {{ user.date_joined|date:"F Y" }}
+            </p>
+        </div>
+
+    </div>
+
+    <!-- Edit Button -->
+    <div class="mt-8 text-center">
+        <a href="{% url 'account_settings' %}" 
+           class="inline-block px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold">
+            Edit Profile
+        </a>
+    </div>
+
+</div>
+{% endblock %}

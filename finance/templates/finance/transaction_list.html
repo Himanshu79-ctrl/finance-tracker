@@ -3,8 +3,11 @@
 
 
 {% block content %}
+    <a href="{% url 'export_transactions' %}" class="ml-4  my-4 inline-block px-6 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transaction duration-200">
+        Generate Report
+    </a>
     <h1 class="text-xl font-bold">Transaction List </h1>
-   <table class="min-w-full table-auto border-collapse border border-gray-300">
+    <table class="min-w-full table-auto border-collapse border border-gray-300">
   <thead>
       <tr class="bg-gray-100">
           <th class="px-4 py-2 border border-gray-300">Date</th>

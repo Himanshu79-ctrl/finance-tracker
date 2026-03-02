@@ -1,51 +1,159 @@
 {% extends 'finance/base.html' %}
 {% block title %}Dashboard{% endblock title %}
 
-
 {% block content %}
-    <div class="container mx-auto p-6">
-        <div class="text-center mb-8">
-            <h1 class="text-3xl font-bold text-indigo-600">Welcome to Your Finance Dashboard</h1>
-            <h1 class="text-2xl font-bold">{{request.user|capfirst}}</h1>
-            <p class="text-xl text-gray-700 mt-2">Track your income, expenses, and goals effectively.</p>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
-            <div class="bg-white p-6 rounded-lg shadow-md">
-                <h2 class="text-xl font-semibold text-gray-800">Total Income</h2>
-                <p class="text-3xl font-bold text-indigo-500">${{ total_income|floatformat:2 }}</p>
+<div class="container mx-auto p-6">
+    <!-- Welcome Section -->
+    <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-indigo-600">Welcome to Your Finance Dashboard</h1>
+        <h1 class="text-2xl font-bold">{{ request.user|capfirst }}</h1>
+        <p class="text-xl text-gray-700 mt-2">Track your income, expenses, and goals effectively.</p>
+    </div>
+    
+    <!-- User Profile Section -->
+    <!-- <div class="flex flex-col items-center mb-8">
+        {% if request.user.profile.avatar %}
+            <img src="{{ request.user.profile.avatar.url }}" alt="Avatar" class="w-24 h-24 rounded-full border-2 border-indigo-500 mb-4">
+        {% else %}
+            <div class="w-24 h-24 rounded-full bg-gray-300 flex items-center justify-center mb-4">
+                <span class="text-gray-600 font-bold">No Avatar</span>
             </div>
-            <div class="bg-white p-6 rounded-lg shadow-md">
-                <h2 class="text-xl font-semibold text-gray-800">Total Expenses</h2>
-                <p class="text-3xl font-bold text-red-500">${{ total_expense|floatformat:2 }}</p>
-            </div>
-            <div class="bg-white p-6 rounded-lg shadow-md">
-                <h2 class="text-xl font-semibold text-gray-800">Net Savings</h2>
-                <p class="text-3xl font-bold text-indigo-600">${{ net_savings|floatformat:2 }}</p>
-            </div>
-        </div>
+        {% endif %}
+        <p class="text-gray-800 text-lg text-center">{{ request.user.profile.bio|default:"No bio available" }}</p>
+    </div> -->
 
-        <div class="bg-white p-6 rounded-lg shadow-md mb-8">
-            <h2 class="text-2xl font-semibold text-gray-800 mb-4">Your Goals</h2>
-            <ul class="space-y-4">
-                {% for item in goal_progress %}
-                <li class="flex justify-between items-center">
-                    <div class="text-gray-800">
-                        <p class="font-semibold">{{ item.goal.name }}</p>
-                        <p class="text-sm text-gray-600">Target: ${{ item.goal.target_amount|floatformat:2 }}</p>
-                        <p class="text-sm text-gray-600">Deadline: {{ item.goal.deadline }}</p>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-xl font-bold text-indigo-500">{{ item.progress|floatformat:2 }}%</p>
-                    </div>
-                </li>
-                {% endfor %}
-            </ul>
+    <!-- Stats Section -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-xl font-semibold text-gray-800">Total Income</h2>
+            <p class="text-3xl font-bold text-indigo-500">${{ total_income|floatformat:2 }}</p>
         </div>
-
-        <div class="text-center">
-          <a href="{% url 'goal_add' %}" class="bg-indigo-500 text-white px-6 py-2 rounded-lg shadow-md hover:bg-indigo-600 transition">Add New Goal</a>
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-xl font-semibold text-gray-800">Total Expenses</h2>
+            <p class="text-3xl font-bold text-red-500">${{ total_expense|floatformat:2 }}</p>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-xl font-semibold text-gray-800">Net Savings</h2>
+            <p class="text-3xl font-bold text-indigo-600">${{ net_savings|floatformat:2 }}</p>
         </div>
     </div>
-{% endblock content %}
+
+    <!-- Goals Section -->
+    <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-4">Your Goals</h2>
+        <ul class="space-y-4">
+            {% for item in goal_progress %}
+            <li class="flex justify-between items-center">
+                <div class="text-gray-800">
+                    <p class="font-semibold">{{ item.goal.name }}</p>
+                    <p class="text-sm text-gray-600">Target: ${{ item.goal.target_amount|floatformat:2 }}</p>
+                    <p class="text-sm text-gray-600">Deadline: {{ item.goal.deadline }}</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-xl font-bold text-indigo-500">{{ item.progress|floatformat:2 }}%</p>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <!-- Add Goal Button -->
+    <div class="text-center">
+      <a href="{% url 'goal_add' %}" class="bg-indigo-500 text-white px-6 py-2 rounded-lg shadow-md hover:bg-indigo-600 transition">Add New Goal</a>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
     
+    <div class="bg-white p-6 rounded shadow-md">
+        <h2 class="text-xl font-bold mb-4 text-center">Income vs Expense</h2>
+        <div class="h-64">
+            <canvas id="pieChart"></canvas>
+        </div>
+    </div>
+
+    <div class="bg-white p-6 rounded shadow-md">
+        <h2 class="text-xl font-bold mb-4 text-center">Monthly Trend</h2>
+        <div class="h-64">
+            <canvas id="lineChart"></canvas>
+        </div>
+    </div>
+
+</div>
+</div>
+
+{{ total_income|default:0|json_script:"total-income" }}
+{{ total_expense|default:0|json_script:"total-expense" }}
+{{ months|json_script:"months-data" }}
+{{ income_data|json_script:"income-data" }}
+{{ expense_data|json_script:"expense-data" }}
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+
+    // --------------------
+    // GET DJANGO DATA SAFELY
+    // --------------------
+    const totalIncome = JSON.parse(document.getElementById('total-income').textContent);
+    const totalExpense = JSON.parse(document.getElementById('total-expense').textContent);
+    const months = JSON.parse(document.getElementById('months-data').textContent);
+    const incomeData = JSON.parse(document.getElementById('income-data').textContent);
+    const expenseData = JSON.parse(document.getElementById('expense-data').textContent);
+
+    // --------------------
+    // PIE CHART
+    // --------------------
+    const pieCanvas = document.getElementById('pieChart');
+
+    if (pieCanvas) {
+        new Chart(pieCanvas, {
+            type: 'pie',
+            data: {
+                labels: ['Income', 'Expense'],
+                datasets: [{
+                    data: [totalIncome, totalExpense],
+                    backgroundColor: ['#22c55e', '#ef4444']
+                }]
+            },
+            options: {
+                responsive: true
+            }
+        });
+    }
+
+    // --------------------
+    // LINE CHART
+    // --------------------
+    const lineCanvas = document.getElementById('lineChart');
+
+    if (lineCanvas) {
+        new Chart(lineCanvas, {
+            type: 'line',
+            data: {
+                labels: months,
+                datasets: [
+                    {
+                        label: 'Income',
+                        data: incomeData,
+                        borderColor: '#22c55e',
+                        backgroundColor: 'rgba(34,197,94,0.2)',
+                        tension: 0.4,
+                        fill: true
+                    },
+                    {
+                        label: 'Expense',
+                        data: expenseData,
+                        borderColor: '#ef4444',
+                        backgroundColor: 'rgba(239,68,68,0.2)',
+                        tension: 0.4,
+                        fill: true
+                    }
+                ]
+            },
+            options: {
+                responsive: true
+            }
+        });
+    }
+
+});
+</script>
+{% endblock content %}

@@ -14,5 +14,5 @@ class TransactionAdmin(ExportMixin, admin.ModelAdmin):
     list_display=   ('date', 'title', 'amount', 'transaction_type')
     search_fields = ('title',)
 
-admin.site.register(Transaction)
+admin.site.register(Transaction, TransactionAdmin)
 admin.site.register(Goal)
