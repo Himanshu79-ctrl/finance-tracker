@@ -169,4 +169,4 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 #media handling
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
