@@ -51,8 +51,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'finance',
-    'import_export',
-    'whitenoise.runserver_nostatic', 
+    'import_export', 
     'cloudinary',
     'cloudinary_storage',
 ]
